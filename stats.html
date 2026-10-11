@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>统计 - 单词刷题器</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="stats">
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">单词刷题器</a>
+      <div class="nav-links">
+        <a href="index.html" data-nav="home">首页</a>
+        <a href="practice.html" data-nav="practice">练习</a>
+        <a href="browse.html" data-nav="browse">词库</a>
+        <a href="mistakes.html" data-nav="mistakes">错题本</a>
+        <a href="stats.html" data-nav="stats">统计</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="stat-grid">
+      <div class="stat-box"><div class="num" id="st-rounds">0</div><div class="label">累计轮数</div></div>
+      <div class="stat-box"><div class="num" id="st-answered">0</div><div class="label">累计答题</div></div>
+      <div class="stat-box"><div class="num green" id="st-rate">—</div><div class="label">总正确率</div></div>
+      <div class="stat-box"><div class="num red" id="st-mistakes">0</div><div class="label">错题本</div></div>
+    </div>
+
+    <div class="card">
+      <h2>分模式正确率</h2>
+      <div class="result-grid" id="mode-grid"></div>
+    </div>
+
+    <div class="card">
+      <h2>易错词 Top 10</h2>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>#</th><th>单词</th><th>词性</th><th>中文释义</th><th>答错次数</th><th>练过次数</th></tr></thead>
+          <tbody id="top-wrong"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>练习记录</h2>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>时间</th><th>模式</th><th>范围</th><th>答题数</th><th>答对</th><th>正确率</th></tr></thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>数据管理</h2>
+      <p style="font-size:14px; color:var(--text-sub); margin-bottom:14px;">
+        所有学习数据保存在当前浏览器的本地存储中。清除浏览器数据会导致记录丢失。
+      </p>
+      <button class="btn btn-danger" id="btn-clear">清空全部学习数据</button>
+    </div>
+  </div>
+
+  <script src="js/words.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    markActiveNav();
+
+    var stats = Store.getStats();
+    var historyList = Store.getHistory();
+
+    // 总览
+    var totalAnswered = 0, totalCorrect = 0;
+    Object.keys(stats).forEach(function (w) {
+      totalAnswered += stats[w].correct + stats[w].wrong;
+      totalCorrect += stats[w].correct;
+    });
+    document.getElementById('st-rounds').textContent = historyList.length;
+    document.getElementById('st-answered').textContent = totalAnswered;
+    document.getElementById('st-rate').textContent = totalAnswered ? Math.round(totalCorrect / totalAnswered * 100) + '%' : '—';
+    document.getElementById('st-mistakes').textContent = Store.getMistakes().length;
+
+    // 分模式正确率（基于练习记录）
+    var modeGrid = document.getElementById('mode-grid');
+    var modes = ['spell', 'pos'];
+    if (!historyList.length) {
+      modeGrid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">还没有练习记录</div>';
+    } else {
+      modeGrid.innerHTML = modes.map(function (mode) {
+        var t = 0, c = 0;
+        historyList.forEach(function (h) {
+          if (h.mode === mode) { t += h.total; c += h.correct; }
+        });
+        return '<div class="stat-box"><div class="num">' + (t ? Math.round(c / t * 100) + '%' : '—') + '</div>' +
+          '<div class="label">' + MODE_LABEL[mode] + '</div></div>';
+      }).join('');
+    }
+
+    // 易错词 Top 10
+    var topWrong = Object.keys(stats)
+      .map(function (w) { var wd = getWord(w); return wd ? { w: wd, s: stats[w] } : null; })
+      .filter(function (x) { return x && x.s.wrong > 0; })
+      .sort(function (a, b) { return b.s.wrong - a.s.wrong; })
+      .slice(0, 10);
+    var topBody = document.getElementById('top-wrong');
+    if (!topWrong.length) {
+      topBody.innerHTML = '<tr><td colspan="6"><div class="empty-state">暂无错题记录</div></td></tr>';
+    } else {
+      topBody.innerHTML = topWrong.map(function (x, i) {
+        return '<tr><td>' + (i + 1) + '</td>' +
+          '<td><b>' + escapeHtml(x.w.word) + '</b></td>' +
+          '<td>' + posTagsHtml(x.w.pos) + '</td>' +
+          '<td class="wrap">' + escapeHtml(x.w.meaning) + '</td>' +
+          '<td>' + x.s.wrong + '</td><td>' + x.s.seen + '</td></tr>';
+      }).join('');
+    }
+
+    // 练习记录
+    var hBody = document.getElementById('history-body');
+    if (!historyList.length) {
+      hBody.innerHTML = '<tr><td colspan="6"><div class="empty-state">暂无练习记录</div></td></tr>';
+    } else {
+      hBody.innerHTML = historyList.slice().reverse().map(function (h) {
+        var rate = h.total ? Math.round(h.correct / h.total * 100) + '%' : '—';
+        var scope = h.scope === 'mistakes' ? '错题本' : '全部词库';
+        return '<tr><td>' + fmtDateTime(h.time) + '</td>' +
+          '<td>' + (MODE_LABEL[h.mode] || h.mode) + '</td>' +
+          '<td>' + scope + '</td>' +
+          '<td>' + h.total + '</td><td>' + h.correct + '</td><td>' + rate + '</td></tr>';
+      }).join('');
+    }
+
+    // 清空数据
+    document.getElementById('btn-clear').addEventListener('click', function () {
+      if (confirm('确定清空全部学习数据吗？此操作不可恢复。')) {
+        Store.clearAll();
+        showToast('已清空，页面即将刷新');
+        setTimeout(function () { location.reload(); }, 900);
+      }
+    });
+  </script>
+</body>
+</html>

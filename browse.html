@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>词库 - 单词刷题器</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="browse">
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">单词刷题器</a>
+      <div class="nav-links">
+        <a href="index.html" data-nav="home">首页</a>
+        <a href="practice.html" data-nav="practice">练习</a>
+        <a href="browse.html" data-nav="browse">词库</a>
+        <a href="mistakes.html" data-nav="mistakes">错题本</a>
+        <a href="stats.html" data-nav="stats">统计</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2>词库浏览 <span id="count-text" style="font-size:14px; color:var(--text-sub); font-weight:400;"></span></h2>
+      <input class="search-input" id="search" placeholder="搜索单词或释义…">
+      <div class="table-wrap" style="margin-top:14px;">
+        <table class="data">
+          <thead>
+            <tr><th>#</th><th>单词</th><th>词性</th><th>中文释义</th><th>练过</th><th>正确率</th><th>状态</th></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/words.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    markActiveNav();
+    var allWords = getAllWords();
+    var searchEl = document.getElementById('search');
+    searchEl.addEventListener('input', render);
+
+    function render() {
+      var kw = normalize(searchEl.value);
+      var stats = Store.getStats();
+      var mistakeSet = {};
+      Store.getMistakes().forEach(function (m) { mistakeSet[m.word] = true; });
+
+      var rows = allWords.filter(function (w) {
+        if (!kw) return true;
+        return w.word.toLowerCase().indexOf(kw) !== -1 || w.meaning.indexOf(kw) !== -1;
+      });
+
+      document.getElementById('count-text').textContent =
+        '（共 ' + allWords.length + ' 词，当前显示 ' + rows.length + ' 词）';
+
+      var tbody = document.getElementById('tbody');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state">没有匹配的单词</div></td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(function (w, i) {
+        var s = stats[w.word] || { seen: 0, correct: 0, wrong: 0 };
+        var answered = s.correct + s.wrong;
+        var acc = answered ? Math.round(s.correct / answered * 100) + '%' : '—';
+        var status = mistakeSet[w.word]
+          ? '<span class="tag-red tag">易错</span>'
+          : (s.seen ? '<span class="tag-green tag">已练</span>' : '<span class="tag" style="background:#f3f4f6;color:#9ca3af;">未练</span>');
+        return '<tr><td>' + (i + 1) + '</td>' +
+          '<td><b>' + escapeHtml(w.word) + '</b></td>' +
+          '<td>' + posTagsHtml(w.pos) + '</td>' +
+          '<td class="wrap">' + escapeHtml(w.meaning) + '</td>' +
+          '<td>' + s.seen + ' 次</td>' +
+          '<td>' + acc + '</td>' +
+          '<td>' + status + '</td></tr>';
+      }).join('');
+    }
+    render();
+  </script>
+</body>
+</html>
