@@ -3,13 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#241c33">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <title>词库 - 单词刷题器</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="browse">
-  <nav class="nav">
+  <header class="nav">
     <div class="nav-inner">
-      <a class="brand" href="index.html">单词刷题器</a>
+      <a class="brand" href="index.html">
+        <span class="brand-mark">词</span>
+        <span class="brand-copy">
+          <strong>单词刷题器</strong>
+          <span class="eyebrow">Vocabulary Quiz</span>
+        </span>
+      </a>
       <div class="nav-links">
         <a href="index.html" data-nav="home">首页</a>
         <a href="practice.html" data-nav="practice">练习</a>
@@ -17,8 +25,12 @@
         <a href="mistakes.html" data-nav="mistakes">错题本</a>
         <a href="stats.html" data-nav="stats">统计</a>
       </div>
+      <div class="status-group">
+        <span class="status-pill">进度 <strong id="pill-progress">–</strong></span>
+        <span class="status-pill">错题本 <strong id="pill-mistakes">–</strong></span>
+      </div>
     </div>
-  </nav>
+  </header>
 
   <div class="container">
     <div class="card">
@@ -39,6 +51,7 @@
   <script src="js/app.js"></script>
   <script>
     markActiveNav();
+    renderTopbarPills();
     var allWords = getAllWords();
     var searchEl = document.getElementById('search');
     searchEl.addEventListener('input', render);

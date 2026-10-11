@@ -142,3 +142,16 @@ function markActiveNav() {
 
 var REASON_LABEL = { spell: '拼写错误', pos: '词性选择错误', manual: '手动标记' };
 var MODE_LABEL = { spell: '拼写模式', pos: '词性自测' };
+
+// 顶栏状态胶囊：进度（已练词数/总词数）与错题数
+function renderTopbarPills() {
+  var stats = Store.getStats();
+  var learned = 0;
+  Object.keys(stats).forEach(function (w) {
+    if (stats[w].seen > 0 && getWord(w)) learned += 1;
+  });
+  var p = document.getElementById('pill-progress');
+  var m = document.getElementById('pill-mistakes');
+  if (p) p.textContent = learned + '/' + getAllWords().length;
+  if (m) m.textContent = String(Store.getMistakes().length);
+}

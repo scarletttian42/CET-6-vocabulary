@@ -3,13 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#241c33">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <title>练习 - 单词刷题器</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="practice">
-  <nav class="nav">
+  <header class="nav">
     <div class="nav-inner">
-      <a class="brand" href="index.html">单词刷题器</a>
+      <a class="brand" href="index.html">
+        <span class="brand-mark">词</span>
+        <span class="brand-copy">
+          <strong>单词刷题器</strong>
+          <span class="eyebrow">Vocabulary Quiz</span>
+        </span>
+      </a>
       <div class="nav-links">
         <a href="index.html" data-nav="home">首页</a>
         <a href="practice.html" data-nav="practice">练习</a>
@@ -17,8 +25,12 @@
         <a href="mistakes.html" data-nav="mistakes">错题本</a>
         <a href="stats.html" data-nav="stats">统计</a>
       </div>
+      <div class="status-group">
+        <span class="status-pill">进度 <strong id="pill-progress">–</strong></span>
+        <span class="status-pill">错题本 <strong id="pill-mistakes">–</strong></span>
+      </div>
     </div>
-  </nav>
+  </header>
 
   <div class="container">
     <!-- 设置面板 -->
@@ -39,9 +51,9 @@
         <button class="scope-btn selected" data-scope="all" id="scope-all">全部词库</button>
         <button class="scope-btn" data-scope="mistakes" id="scope-mistakes">仅错题本</button>
       </div>
-      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <div class="setup-row">
         <button class="btn btn-primary" id="btn-start">开始练习</button>
-        <span id="setup-info" style="font-size:14px; color:var(--text-sub);"></span>
+        <span class="hint" id="setup-info"></span>
       </div>
     </div>
 
@@ -49,9 +61,9 @@
     <div class="card" id="quiz-panel" style="display:none;">
       <div class="quiz-header">
         <span class="progress-text" id="progress-text"></span>
-        <span>
+        <span class="quiz-header-right">
           <span class="tag" id="mode-tag"></span>
-          <button class="btn btn-ghost btn-sm" id="btn-quit" style="margin-left:8px;">结束本轮</button>
+          <button class="btn btn-ghost btn-sm" id="btn-quit">结束本轮</button>
         </span>
       </div>
       <div class="progress-bar"><div class="fill" id="progress-fill" style="width:0%"></div></div>
@@ -63,9 +75,9 @@
     <!-- 结果面板 -->
     <div class="card" id="result-panel" style="display:none;">
       <div class="result-head">
-        <div style="font-size:15px; color:var(--text-sub);">本轮练习结束</div>
+        <div class="muted">本轮练习结束</div>
         <div class="big" id="result-rate"></div>
-        <div style="font-size:14px; color:var(--text-sub);" id="result-summary"></div>
+        <div class="muted" id="result-summary"></div>
       </div>
       <div class="result-grid" id="result-grid"></div>
       <div id="result-wrong" style="display:none;">
@@ -84,6 +96,7 @@
   <script src="js/app.js"></script>
   <script>
     markActiveNav();
+    renderTopbarPills();
 
     var state = {
       mode: null,        // 'spell' | 'pos'
