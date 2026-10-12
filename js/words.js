@@ -51,7 +51,7 @@ const WORDS = [
   { "word": "layman", "pos": ["n."], "meaning": "门外汉" },
   { "word": "tilt", "pos": ["v."], "meaning": "倾斜" },
   { "word": "vacant", "pos": ["adj."], "meaning": "空缺的" },
-  { "word": "pitch", "pos": ["v.", "n."], "meaning": "投掷；音高；强度" }
+  { "word": "pitch", "pos": ["v.", "n."], "meaning": "投掷；音高；强度" },
   { "word": "resort", "pos": ["n.", "v."], "meaning": "度假胜地；诉诸，采用（+to）" },
   { "word": "dub", "pos": ["v."], "meaning": "授予（称号）；配音" },
   { "word": "spur", "pos": ["v."], "meaning": "激励，鞭策；推动" },
