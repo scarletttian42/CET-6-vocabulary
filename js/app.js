@@ -89,7 +89,26 @@ function getWordsForMode(mode) {
   });
   return Object.keys(map).map(function (k) { return map[k]; });
 }
+// 将词列表按 meaning 分组（同义词归到同一组，用于拼写模式多输入框）
+function groupSpellWords(words) {
+  var groups = {};
+  words.forEach(function (w) {
+    var key = normalize(w.meaning);
+    if (!groups[key]) {
+      groups[key] = { meaning: w.meaning, pos: [], words: [] };
+    }
+    w.pos.forEach(function (p) {
+      if (groups[key].pos.indexOf(p) === -1) groups[key].pos.push(p);
+    });
+    groups[key].words.push(w);
+  });
+  return Object.keys(groups).map(function (k) { return groups[k]; });
+}
 
+// 获取拼写模式的分组词库
+function getSpellGroups() {
+  return groupSpellWords(getWordsForMode('spell'));
+}
 // 词库中实际出现的全部词性（固定5种 + 动态补充）
 function getAllPosValues(words) {
   var set = POS_BASE.slice();
