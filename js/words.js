@@ -1,4 +1,6 @@
-// ===== 单词库 =====
+// 两个词库分别对应两个刷题模式：
+//   WORDS       → 词性自测模式（看单词选词性）
+//   WORDS_SPELL → 拼写模式（看中文输入英文）
 // 加新词：照下面格式复制一行，改好单词/词性/释义，保存后推送到 GitHub 即可。
 // 词性可选值：v. n. adv. adj. pron.（一词多性写多个，如 "v.", "n."）
 const WORDS = [
@@ -152,4 +154,8 @@ const WORDS = [
   { "word": "fuss", "pos": ["n."], "meaning": "大惊小怪，小题大做" },
   { "word": "uphold", "pos": ["v."], "meaning": "举起；维护，支持" },
   { "word": "inferior", "pos": ["adj."], "meaning": "差的；低劣的；低等的" }
+];
+// ===== 拼写模式词库（等你发新 Excel 后填入） =====
+const WORDS_SPELL = [
+  // { "word": "example", "pos": ["n."], "meaning": "例子" },
 ];
