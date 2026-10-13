@@ -157,5 +157,5 @@ const WORDS = [
 ];
 // ===== 拼写模式词库（等你发新 Excel 后填入） =====
 const WORDS_SPELL = [
-  // { "word": "example", "pos": ["n."], "meaning": "例子" },
+  // { "word": "country", "pos": ["n."], "meaning": "乡村"  },
 ];
