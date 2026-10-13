@@ -160,7 +160,7 @@
     }
     function getPool() {
       if (state.scope === 'mistakes') {
-        return Store.getMistakes().map(function (m) { return getWord(m.word); }).filter(Boolean);
+        return Store.getMistakes().map(function (m) { return getWordsForMode(state.mode); }).filter(Boolean);
       }
       return getAllWords();
     }
