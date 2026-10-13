@@ -53,10 +53,32 @@ var Store = {
 // ===== 词库 =====
 var POS_BASE = ['v.', 'n.', 'adv.', 'adj.', 'pron.'];
 
-// 去重后的全量词库（按单词去重，后出现的覆盖先出现的）
+// 去重后的全量词库（两个词库合并）
 function getAllWords() {
   var map = {};
-  (typeof WORDS !== 'undefined' ? WORDS : []).forEach(function (w) {
+  var sources = [].concat(
+    typeof WORDS !== 'undefined' ? WORDS : [],
+    typeof WORDS_SPELL !== 'undefined' ? WORDS_SPELL : []
+  );
+  sources.forEach(function (w) {
+    if (!w || !w.word) return;
+    var key = String(w.word).trim().toLowerCase();
+    map[key] = {
+      word: String(w.word).trim(),
+      pos: (w.pos || []).map(function (p) { return String(p).trim(); }).filter(Boolean),
+      meaning: String(w.meaning || '').trim()
+    };
+  });
+  return Object.keys(map).map(function (k) { return map[k]; });
+}
+
+// 按模式获取对应词库
+function getWordsForMode(mode) {
+  var src = (mode === 'spell')
+    ? (typeof WORDS_SPELL !== 'undefined' ? WORDS_SPELL : [])
+    : (typeof WORDS !== 'undefined' ? WORDS : []);
+  var map = {};
+  src.forEach(function (w) {
     if (!w || !w.word) return;
     var key = String(w.word).trim().toLowerCase();
     map[key] = {
