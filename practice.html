@@ -203,47 +203,7 @@
       else renderPos(w);
     }
 
-    // ===== 拼写模式 =====
-    function renderSpell(w) {
-      el.questionBox.innerHTML =
-        '<div class="q-pos-tags">' + posTagsHtml(w.pos) + '</div>' +
-        '<div class="q-meaning">' + escapeHtml(w.meaning) + '</div>' +
-        '<div class="q-word-hint">请输入对应的英文单词</div>' +
-        '<input class="spell-input" id="spell-input" autocomplete="off" autocapitalize="off" spellcheck="false">' +
-        '<div class="quiz-actions"><button class="btn btn-primary" id="btn-check">提交</button></div>';
-      var input = document.getElementById('spell-input');
-      input.focus();
-      document.getElementById('btn-check').addEventListener('click', checkSpell);
-      input.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') checkSpell();
-      });
-
-      function checkSpell() {
-        if (input.disabled) return;
-        var val = input.value.trim();
-        if (!val) { showToast('请输入单词'); return; }
-        input.disabled = true;
-        var ok = normalize(val) === normalize(w.word);
-        input.classList.add(ok ? 'right' : 'wrong');
-        state.answered += 1;
-        Store.recordAnswer(w.word, ok);
-        if (ok) {
-          state.correct += 1;
-          el.feedback.textContent = '回答正确';
-          el.feedback.className = 'feedback ok';
-          setTimeout(nextQuestion, 750);
-        } else {
-          state.wrongWords.push(w);
-          Store.addMistake(w.word, 'spell');
-          el.feedback.textContent = '答错了，正确答案是 ' + w.word;
-          el.feedback.className = 'feedback bad';
-          el.actions.innerHTML = '<button class="btn btn-primary" id="btn-next">下一题</button>';
-          document.getElementById('btn-next').addEventListener('click', nextQuestion);
-        }
-      }
-    }
-
-    // ===== 词性自测模式 =====
+    // ===== 拼写模式（同义词多输入框） =====
     function renderSpell(group) {
       var words = group.words;
       var n = words.length;
@@ -328,7 +288,86 @@
         }
       }
     }
-    
+    // ===== 词性自测模式 =====
+    function renderPos(w) {
+      state.posPicked = [];
+      var posList = getAllPosValues(getAllWords());
+      var btns = posList.map(function (p) {
+        return '<button class="pos-btn" data-pos="' + escapeHtml(p) + '">' + escapeHtml(p) + '</button>';
+      }).join('');
+      el.questionBox.innerHTML =
+        '<div class="q-word-hint">请选出下面单词的词性（可多选），并回忆中文释义</div>' +
+        '<div class="q-word">' + escapeHtml(w.word) + '</div>' +
+        '<div class="pos-btns">' + btns + '</div>' +
+        '<div class="quiz-actions"><button class="btn btn-primary" id="btn-reveal">揭晓答案</button></div>';
+
+      el.questionBox.querySelectorAll('.pos-btn').forEach(function (b) {
+        b.addEventListener('click', function () {
+          if (b.classList.contains('correct') || b.classList.contains('wrong-pick')) return;
+          var p = b.getAttribute('data-pos');
+          var i = state.posPicked.indexOf(p);
+          if (i === -1) { state.posPicked.push(p); b.classList.add('selected'); }
+          else { state.posPicked.splice(i, 1); b.classList.remove('selected'); }
+        });
+      });
+      document.getElementById('btn-reveal').addEventListener('click', function () { revealPos(w); });
+    }
+
+    function revealPos(w) {
+      var correctSet = w.pos.slice().sort();
+      var pickedSet = state.posPicked.slice().sort();
+      var posOk = correctSet.length === pickedSet.length &&
+        correctSet.every(function (p, i) { return p === pickedSet[i]; });
+
+      state.answered += 1;
+      Store.recordAnswer(w.word, posOk);
+
+      el.questionBox.querySelectorAll('.pos-btn').forEach(function (b) {
+        var p = b.getAttribute('data-pos');
+        b.classList.remove('selected');
+        if (w.pos.indexOf(p) !== -1) b.classList.add('correct');
+        else if (state.posPicked.indexOf(p) !== -1) b.classList.add('wrong-pick');
+      });
+      document.getElementById('btn-reveal').disabled = true;
+
+      var pickedText = state.posPicked.length ? state.posPicked.join(' / ') : '（未选择）';
+      var revealHtml =
+        '<div class="line"><b>你的选择：</b>' + escapeHtml(pickedText) + (posOk ? ' ✓' : '') + '</div>' +
+        '<div class="line"><b>中文释义：</b>' + escapeHtml(w.meaning) + '</div>';
+      var actionsHtml;
+
+      if (posOk) {
+        state.correct += 1;
+        el.feedback.textContent = '词性正确';
+        el.feedback.className = 'feedback ok';
+        el.questionBox.insertAdjacentHTML('beforeend',
+          '<div class="answer-reveal good">' + revealHtml + '</div>');
+        actionsHtml =
+          '<button class="btn btn-primary" id="btn-ok">已掌握 · 下一题</button>' +
+          '<button class="btn btn-outline" id="btn-manual">没记住 · 加入错题本</button>';
+      } else {
+        state.wrongWords.push(w);
+        Store.addMistake(w.word, 'pos');
+        el.feedback.textContent = '词性不对，已自动加入错题本';
+        el.feedback.className = 'feedback bad';
+        el.questionBox.insertAdjacentHTML('beforeend',
+          '<div class="answer-reveal bad">' + revealHtml + '</div>');
+        actionsHtml = '<button class="btn btn-primary" id="btn-next">下一题</button>';
+      }
+      el.actions.innerHTML = actionsHtml;
+
+      var next = document.getElementById('btn-next');
+      var okBtn = document.getElementById('btn-ok');
+      var manualBtn = document.getElementById('btn-manual');
+      if (next) next.addEventListener('click', nextQuestion);
+      if (okBtn) okBtn.addEventListener('click', nextQuestion);
+      if (manualBtn) manualBtn.addEventListener('click', function () {
+        state.manualCount += 1;
+        state.wrongWords.push(w);
+        Store.addMistake(w.word, 'manual');
+        nextQuestion();
+      });
+    }    
         function nextQuestion() {
           state.idx += 1;
           if (state.idx >= state.queue.length) endRound();
