@@ -158,12 +158,15 @@
         el.setupInfo.textContent = '错题本是空的，先去练习吧。';
       }
     }
-    function getPool() {
-      if (state.scope === 'mistakes') {
-        return Store.getMistakes().map(function (m) { return getWordsForMode(state.mode); }).filter(Boolean);
-      }
-      return getAllWords();
+  function getPool() {
+    if (state.scope === 'mistakes') {
+      var mistakeWords = Store.getMistakes().map(function (m) { return getWord(m.word); }).filter(Boolean);
+      if (state.mode === 'spell') return groupSpellWords(mistakeWords);
+      return mistakeWords;
     }
+    if (state.mode === 'spell') return getSpellGroups();
+    return getWordsForMode(state.mode);
+  }
 
     document.getElementById('btn-start').addEventListener('click', startRound);
     document.getElementById('btn-quit').addEventListener('click', endRound);
@@ -241,93 +244,97 @@
     }
 
     // ===== 词性自测模式 =====
-    function renderPos(w) {
-      state.posPicked = [];
-      var posList = getAllPosValues(getAllWords());
-      var btns = posList.map(function (p) {
-        return '<button class="pos-btn" data-pos="' + escapeHtml(p) + '">' + escapeHtml(p) + '</button>';
-      }).join('');
-      el.questionBox.innerHTML =
-        '<div class="q-word-hint">请选出下面单词的词性（可多选），并回忆中文释义</div>' +
-        '<div class="q-word">' + escapeHtml(w.word) + '</div>' +
-        '<div class="pos-btns">' + btns + '</div>' +
-        '<div class="quiz-actions"><button class="btn btn-primary" id="btn-reveal">揭晓答案</button></div>';
-
-      el.questionBox.querySelectorAll('.pos-btn').forEach(function (b) {
-        b.addEventListener('click', function () {
-          if (b.classList.contains('correct') || b.classList.contains('wrong-pick')) return;
-          var p = b.getAttribute('data-pos');
-          var i = state.posPicked.indexOf(p);
-          if (i === -1) { state.posPicked.push(p); b.classList.add('selected'); }
-          else { state.posPicked.splice(i, 1); b.classList.remove('selected'); }
-        });
-      });
-      document.getElementById('btn-reveal').addEventListener('click', function () { revealPos(w); });
-    }
-
-    function revealPos(w) {
-      var correctSet = w.pos.slice().sort();
-      var pickedSet = state.posPicked.slice().sort();
-      var posOk = correctSet.length === pickedSet.length &&
-        correctSet.every(function (p, i) { return p === pickedSet[i]; });
-
-      state.answered += 1;
-      Store.recordAnswer(w.word, posOk);
-
-      // 高亮词性按钮
-      el.questionBox.querySelectorAll('.pos-btn').forEach(function (b) {
-        var p = b.getAttribute('data-pos');
-        b.classList.remove('selected');
-        if (w.pos.indexOf(p) !== -1) b.classList.add('correct');
-        else if (state.posPicked.indexOf(p) !== -1) b.classList.add('wrong-pick');
-      });
-      document.getElementById('btn-reveal').disabled = true;
-
-      var pickedText = state.posPicked.length ? state.posPicked.join(' / ') : '（未选择）';
-      var revealHtml =
-        '<div class="line"><b>你的选择：</b>' + escapeHtml(pickedText) + (posOk ? ' ✓' : '') + '</div>' +
-        '<div class="line"><b>中文释义：</b>' + escapeHtml(w.meaning) + '</div>';
-      var actionsHtml;
-
-      if (posOk) {
-        state.correct += 1;
-        el.feedback.textContent = '词性正确';
-        el.feedback.className = 'feedback ok';
-        el.questionBox.insertAdjacentHTML('beforeend',
-          '<div class="answer-reveal good">' + revealHtml + '</div>');
-        actionsHtml =
-          '<button class="btn btn-primary" id="btn-ok">已掌握 · 下一题</button>' +
-          '<button class="btn btn-outline" id="btn-manual">没记住 · 加入错题本</button>';
-      } else {
-        state.wrongWords.push(w);
-        Store.addMistake(w.word, 'pos');
-        el.feedback.textContent = '词性不对，已自动加入错题本';
-        el.feedback.className = 'feedback bad';
-        el.questionBox.insertAdjacentHTML('beforeend',
-          '<div class="answer-reveal bad">' + revealHtml + '</div>');
-        actionsHtml = '<button class="btn btn-primary" id="btn-next">下一题</button>';
+    function renderSpell(group) {
+      var words = group.words;
+      var n = words.length;
+      var inputsHtml = '';
+      for (var i = 0; i < n; i++) {
+        inputsHtml += '<input class="spell-input" id="spell-input-' + i +
+          '" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="第 ' + (i + 1) + ' 个">';
       }
-      el.actions.innerHTML = actionsHtml;
-
-      var next = document.getElementById('btn-next');
-      var okBtn = document.getElementById('btn-ok');
-      var manualBtn = document.getElementById('btn-manual');
-      if (next) next.addEventListener('click', nextQuestion);
-      if (okBtn) okBtn.addEventListener('click', nextQuestion);
-      if (manualBtn) manualBtn.addEventListener('click', function () {
-        state.manualCount += 1;
-        state.wrongWords.push(w);
-        Store.addMistake(w.word, 'manual');
-        nextQuestion();
+      el.questionBox.innerHTML =
+        '<div class="q-pos-tags">' + posTagsHtml(group.pos) + '</div>' +
+        '<div class="q-meaning">' + escapeHtml(group.meaning) + '</div>' +
+        '<div class="q-word-hint">' + (n > 1
+          ? '共有 ' + n + ' 个同义词，请全部拼写出来（顺序不限）'
+          : '请输入对应的英文单词') + '</div>' +
+        inputsHtml +
+        '<div class="quiz-actions"><button class="btn btn-primary" id="btn-check">提交</button></div>';
+    
+      var firstInput = document.getElementById('spell-input-0');
+      if (firstInput) firstInput.focus();
+      document.getElementById('btn-check').addEventListener('click', checkSpell);
+    
+      var lastInput = document.getElementById('spell-input-' + (n - 1));
+      if (lastInput) lastInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') checkSpell();
       });
+    
+      function checkSpell() {
+        var inputVals = [];
+        for (var i = 0; i < n; i++) {
+          var inp = document.getElementById('spell-input-' + i);
+          if (inp.disabled) return;
+          var v = inp.value.trim();
+          if (!v) { showToast('请填写所有输入框'); return; }
+          inputVals.push({ el: inp, val: normalize(v), idx: i });
+        }
+        inputVals.forEach(function (x) { x.el.disabled = true; });
+    
+        var wordMatched = new Array(words.length).fill(false);
+        var inputCorrect = new Array(n).fill(false);
+    
+        inputVals.forEach(function (input) {
+          for (var j = 0; j < words.length; j++) {
+            if (!wordMatched[j] && input.val === normalize(words[j].word)) {
+              wordMatched[j] = true;
+              inputCorrect[input.idx] = true;
+              break;
+            }
+          }
+        });
+    
+        var allCorrect = wordMatched.every(function (m) { return m; });
+    
+        inputVals.forEach(function (input) {
+          input.el.classList.add(inputCorrect[input.idx] ? 'right' : 'wrong');
+        });
+    
+        state.answered += 1;
+    
+        words.forEach(function (w, j) {
+          Store.recordAnswer(w.word, wordMatched[j]);
+        });
+    
+        if (allCorrect) {
+          state.correct += 1;
+          el.feedback.textContent = n > 1 ? n + ' 个词全部正确' : '回答正确';
+          el.feedback.className = 'feedback ok';
+          setTimeout(nextQuestion, 800);
+        } else {
+          var correctList = [], missedList = [];
+          words.forEach(function (w, j) {
+            state.wrongWords.push(w);
+            Store.addMistake(w.word, 'spell');
+            if (wordMatched[j]) correctList.push(w.word);
+            else missedList.push(w.word);
+          });
+          el.feedback.textContent = '未答全。正确：' +
+            (correctList.length ? correctList.join('、') : '无') +
+            '；遗漏/拼错：' + missedList.join('、');
+          el.feedback.className = 'feedback bad';
+          el.actions.innerHTML = '<button class="btn btn-primary" id="btn-next">下一题</button>';
+          document.getElementById('btn-next').addEventListener('click', nextQuestion);
+        }
+      }
     }
-
-    function nextQuestion() {
-      state.idx += 1;
-      if (state.idx >= state.queue.length) endRound();
-      else renderQuestion();
-    }
-
+    
+        function nextQuestion() {
+          state.idx += 1;
+          if (state.idx >= state.queue.length) endRound();
+          else renderQuestion();
+        }
+    
     // ===== 结果 =====
     function endRound() {
       el.quiz.style.display = 'none';
