@@ -302,7 +302,698 @@ const WORDS = [
   { "word": "misrepresent", "pos": ["v."],            "meaning": "歪曲；误报" },
   { "word": "articulate",   "pos": ["adj.", "v."],    "meaning": "口齿清晰的；清楚表达" },
   { "word": "sprout",       "pos": ["v."],            "meaning": "发芽；开始生长" },
-  { "word": "sediment",     "pos": ["n."],            "meaning": "沉积物；沉淀" }
+  { "word": "sediment",     "pos": ["n."],            "meaning": "沉积物；沉淀" },
+  { "word": "brake", "pos": ["n.","v."], "meaning": "刹车"},
+  {
+    "word": "margin",
+    "pos": [
+      "n."
+    ],
+    "meaning": "利润"
+  },
+  {
+    "word": "flatter",
+    "pos": [
+      "v."
+    ],
+    "meaning": "阿谀奉承"
+  },
+  {
+    "word": "shoal",
+    "pos": [
+      "n."
+    ],
+    "meaning": "浅滩；一群（鱼）"
+  },
+  {
+    "word": "stagger",
+    "pos": [
+      "n.",
+      "v."
+    ],
+    "meaning": "蹒跚，摇晃不稳地走"
+  },
+  {
+    "word": "immerse",
+    "pos": [
+      "v."
+    ],
+    "meaning": "沉浸，沉浸于"
+  },
+  {
+    "word": "loaf",
+    "pos": [
+      "v."
+    ],
+    "meaning": "虚度光阴"
+  },
+  {
+    "word": "mourn",
+    "pos": [
+      "v."
+    ],
+    "meaning": "哀悼"
+  },
+  {
+    "word": "tenant",
+    "pos": [
+      "n."
+    ],
+    "meaning": "承租人，佃户"
+  },
+  {
+    "word": "stumble",
+    "pos": [
+      "v.",
+      "n."
+    ],
+    "meaning": "绊倒"
+  },
+  {
+    "word": "permissible",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "容许的；许可的"
+  },
+  {
+    "word": "deteriorate",
+    "pos": [
+      "v."
+    ],
+    "meaning": "恶化"
+  },
+  {
+    "word": "cereal",
+    "pos": [
+      "n."
+    ],
+    "meaning": "谷类食物"
+  },
+  {
+    "word": "deficit",
+    "pos": [
+      "n."
+    ],
+    "meaning": "不足额；缺少"
+  },
+  {
+    "word": "stool",
+    "pos": [
+      "n."
+    ],
+    "meaning": "凳子"
+  },
+  {
+    "word": "accommodate",
+    "pos": [
+      "v."
+    ],
+    "meaning": "为...提供便利；适应"
+  },
+  {
+    "word": "prone",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "易于...的"
+  },
+  {
+    "word": "mercury",
+    "pos": [
+      "n."
+    ],
+    "meaning": "汞，水银"
+  },
+  {
+    "word": "conscientious",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "认真的，勤恳的"
+  },
+  {
+    "word": "bracket",
+    "pos": [
+      "n."
+    ],
+    "meaning": "档次，等级段"
+  },
+  {
+    "word": "stall",
+    "pos": [
+      "v."
+    ],
+    "meaning": "暂缓，搁置"
+  },
+  {
+    "word": "pearl",
+    "pos": [
+      "n."
+    ],
+    "meaning": "珍珠"
+  },
+  {
+    "word": "moan",
+    "pos": [
+      "n.",
+      "v."
+    ],
+    "meaning": "抱怨"
+  },
+  {
+    "word": "haunt",
+    "pos": [
+      "v."
+    ],
+    "meaning": "萦绕，长期纠缠"
+  },
+  {
+    "word": "susceptible",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "易受影响的"
+  },
+  {
+    "word": "retrospect",
+    "pos": [
+      "n."
+    ],
+    "meaning": "回顾"
+  },
+  {
+    "word": "patent",
+    "pos": [
+      "n.",
+      "v."
+    ],
+    "meaning": "专利证书；取得专利权"
+  },
+  {
+    "word": "continuity",
+    "pos": [
+      "n."
+    ],
+    "meaning": "连续性"
+  },
+  {
+    "word": "simultaneous",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "同时的"
+  },
+  {
+    "word": "obsolete",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "已过时的"
+  },
+  {
+    "word": "sponge",
+    "pos": [
+      "n."
+    ],
+    "meaning": "海绵，松蛋糕"
+  },
+  {
+    "word": "pamphlet",
+    "pos": [
+      "n."
+    ],
+    "meaning": "小册子"
+  },
+  {
+    "word": "brisk",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "轻快的"
+  },
+  {
+    "word": "unrest",
+    "pos": [
+      "n."
+    ],
+    "meaning": "动荡，动乱"
+  },
+  {
+    "word": "ascribe",
+    "pos": [
+      "v."
+    ],
+    "meaning": "把...归因于"
+  },
+  {
+    "word": "hatred",
+    "pos": [
+      "n."
+    ],
+    "meaning": "憎恨"
+  },
+  {
+    "word": "rear",
+    "pos": [
+      "v.",
+      "adj.",
+      "n."
+    ],
+    "meaning": "抚养；背面（的），后面（的）"
+  },
+  {
+    "word": "enlighten",
+    "pos": [
+      "v."
+    ],
+    "meaning": "启发，开导"
+  },
+  {
+    "word": "mortgage",
+    "pos": [
+      "n."
+    ],
+    "meaning": "抵押贷款"
+  },
+  {
+    "word": "spontaneous",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "自发的"
+  },
+  {
+    "word": "precipitate",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "仓促的，贸然的"
+  },
+  {
+    "word": "static",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "停滞的"
+  },
+  {
+    "word": "ornament",
+    "pos": [
+      "n."
+    ],
+    "meaning": "装饰物"
+  },
+  {
+    "word": "rotten",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "腐烂的"
+  },
+  {
+    "word": "slack",
+    "pos": [
+      "adj.",
+      "v."
+    ],
+    "meaning": "松弛的；逃避工作"
+  },
+  {
+    "word": "linger",
+    "pos": [
+      "v."
+    ],
+    "meaning": "逗留"
+  },
+  {
+    "word": "bound",
+    "pos": [
+      "v."
+    ],
+    "meaning": "跳跃前行"
+  },
+  {
+    "word": "commence",
+    "pos": [
+      "v."
+    ],
+    "meaning": "开始"
+  },
+  {
+    "word": "restrain",
+    "pos": [
+      "v."
+    ],
+    "meaning": "制止；阻止"
+  },
+  {
+    "word": "arc",
+    "pos": [
+      "n."
+    ],
+    "meaning": "弧"
+  },
+  {
+    "word": "bid",
+    "pos": [
+      "n.",
+      "v."
+    ],
+    "meaning": "出价；投标；努力争取"
+  },
+  {
+    "word": "terrain",
+    "pos": [
+      "n."
+    ],
+    "meaning": "地面"
+  },
+  {
+    "word": "incur",
+    "pos": [
+      "v."
+    ],
+    "meaning": "招致"
+  },
+  {
+    "word": "withstand",
+    "pos": [
+      "v."
+    ],
+    "meaning": "承受住"
+  },
+  {
+    "word": "slope",
+    "pos": [
+      "n."
+    ],
+    "meaning": "山坡；坡；坡度"
+  },
+  {
+    "word": "toll",
+    "pos": [
+      "n."
+    ],
+    "meaning": "损害；通行费"
+  },
+  {
+    "word": "dwell",
+    "pos": [
+      "v."
+    ],
+    "meaning": "居住"
+  },
+  {
+    "word": "manuscript",
+    "pos": [
+      "n."
+    ],
+    "meaning": "手稿；手抄本"
+  },
+  {
+    "word": "spacious",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "宽敞的"
+  },
+  {
+    "word": "shabby",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "破烂的"
+  },
+  {
+    "word": "invoice",
+    "pos": [
+      "n.",
+      "v."
+    ],
+    "meaning": "提供费用；清单"
+  },
+  {
+    "word": "badge",
+    "pos": [
+      "n."
+    ],
+    "meaning": "徽章"
+  },
+  {
+    "word": "cylinder",
+    "pos": [
+      "n."
+    ],
+    "meaning": "圆柱体"
+  },
+  {
+    "word": "offset",
+    "pos": [
+      "v."
+    ],
+    "meaning": "抵消"
+  },
+  {
+    "word": "debris",
+    "pos": [
+      "n."
+    ],
+    "meaning": "废墟；残骸"
+  },
+  {
+    "word": "spectrum",
+    "pos": [
+      "n."
+    ],
+    "meaning": "光谱；范围"
+  },
+  {
+    "word": "pinch",
+    "pos": [
+      "n."
+    ],
+    "meaning": "捏；少量"
+  },
+  {
+    "word": "pillar",
+    "pos": [
+      "n."
+    ],
+    "meaning": "柱状物"
+  },
+  {
+    "word": "laudable",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "值得称赞的"
+  },
+  {
+    "word": "petition",
+    "pos": [
+      "n."
+    ],
+    "meaning": "请愿书"
+  },
+  {
+    "word": "reassure",
+    "pos": [
+      "v."
+    ],
+    "meaning": "使放心"
+  },
+  {
+    "word": "vice",
+    "pos": [
+      "n.",
+      "adj."
+    ],
+    "meaning": "缺点；副的"
+  },
+  {
+    "word": "pinpoint",
+    "pos": [
+      "v."
+    ],
+    "meaning": "准确找到"
+  },
+  {
+    "word": "spoil",
+    "pos": [
+      "v."
+    ],
+    "meaning": "破坏，糟蹋"
+  },
+  {
+    "word": "haul",
+    "pos": [
+      "v.",
+      "n."
+    ],
+    "meaning": "拖，硬拖；拖运路程"
+  },
+  {
+    "word": "infant",
+    "pos": [
+      "adj.",
+      "n."
+    ],
+    "meaning": "婴儿（的）"
+  },
+  {
+    "word": "excavate",
+    "pos": [
+      "v."
+    ],
+    "meaning": "挖出"
+  },
+  {
+    "word": "equivalent",
+    "pos": [
+      "adj.",
+      "n."
+    ],
+    "meaning": "相等（的）"
+  },
+  {
+    "word": "linen",
+    "pos": [
+      "n."
+    ],
+    "meaning": "亚麻布（的）"
+  },
+  {
+    "word": "nuance",
+    "pos": [
+      "n."
+    ],
+    "meaning": "细微差别"
+  },
+  {
+    "word": "inspection",
+    "pos": [
+      "n."
+    ],
+    "meaning": "检查，细看"
+  },
+  {
+    "word": "crude",
+    "pos": [
+      "n.",
+      "adj."
+    ],
+    "meaning": "原油；粗略的"
+  },
+  {
+    "word": "turbulent",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "急的；混乱的"
+  },
+  {
+    "word": "denounce",
+    "pos": [
+      "v."
+    ],
+    "meaning": "谴责"
+  },
+  {
+    "word": "constrain",
+    "pos": [
+      "v."
+    ],
+    "meaning": "限制；约束"
+  },
+  {
+    "word": "furious",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "愤怒的"
+  },
+  {
+    "word": "chop",
+    "pos": [
+      "n.",
+      "v."
+    ],
+    "meaning": "劈"
+  },
+  {
+    "word": "condemn",
+    "pos": [
+      "v."
+    ],
+    "meaning": "责备"
+  },
+  {
+    "word": "ceramic",
+    "pos": [
+      "adj.",
+      "n."
+    ],
+    "meaning": "陶瓷（的）"
+  },
+  {
+    "word": "conviction",
+    "pos": [
+      "n."
+    ],
+    "meaning": "坚强信念"
+  },
+  {
+    "word": "sin",
+    "pos": [
+      "n."
+    ],
+    "meaning": "罪"
+  },
+  {
+    "word": "commonplace",
+    "pos": [
+      "adj.",
+      "n."
+    ],
+    "meaning": "平常的；老生常谈"
+  },
+  {
+    "word": "impulse",
+    "pos": [
+      "adj.",
+      "n."
+    ],
+    "meaning": "冲动（的）"
+  },
+  {
+    "word": "pathetic",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "可怜的"
+  },
+  {
+    "word": "elastic",
+    "pos": [
+      "adj."
+    ],
+    "meaning": "可伸缩的"
+  },
+  {
+    "word": "alloy",
+    "pos": [
+      "n."
+    ],
+    "meaning": "合金"
+  },
+  {
+    "word": "ritual",
+    "pos": [
+      "n."
+    ],
+    "meaning": "仪式"
+  }
 ];
 // ===== 拼写模式词库（等你发新 Excel 后填入） =====
 const WORDS_SPELL = [
