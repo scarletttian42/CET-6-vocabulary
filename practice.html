@@ -155,13 +155,21 @@
       var pool = getPool();
       el.setupInfo.textContent = '本范围共 ' + pool.length + ' 词，将乱序全部刷完。';
       if (state.scope === 'mistakes' && pool.length === 0) {
-        el.setupInfo.textContent = '错题本是空的，先去练习吧。';
+        el.setupInfo.textContent = Store.getValidMistakes().length
+          ? '当前模式下没有错题，切换到另一个模式试试。'
+          : '错题本是空的，先去练习吧。';
       }
     }
   function getPool() {
     if (state.scope === 'mistakes') {
-      var mistakeWords = Store.getMistakes().map(function (m) { return getWord(m.word); }).filter(Boolean);
-      if (state.mode === 'spell') return groupSpellWords(mistakeWords);
+      var wantSpell = state.mode === 'spell';
+      var mistakeWords = Store.getValidMistakes()
+        .filter(function (m) {
+          return wantSpell ? m.reason === 'spell' : m.reason !== 'spell';
+        })
+        .map(function (m) { return getWord(m.word); })
+        .filter(Boolean);
+      if (wantSpell) return groupSpellWords(mistakeWords);
       return mistakeWords;
     }
     if (state.mode === 'spell') return getSpellGroups();
@@ -180,7 +188,12 @@
     // ===== 流程控制 =====
     function startRound() {
       var pool = getPool();
-      if (pool.length === 0) { showToast(state.scope === 'mistakes' ? '错题本是空的' : '词库为空'); return; }
+      if (pool.length === 0) {
+        showToast(state.scope === 'mistakes'
+          ? (Store.getValidMistakes().length ? '当前模式下没有错题' : '错题本是空的')
+          : '词库为空');
+        return;
+      }
       state.queue = shuffle(pool);
       state.idx = 0; state.answered = 0; state.correct = 0; state.manualCount = 0;
       state.wrongWords = [];
@@ -268,16 +281,21 @@
     
         if (allCorrect) {
           state.correct += 1;
+          words.forEach(function (w) { Store.removeMistake(w.word); });
           el.feedback.textContent = n > 1 ? n + ' 个词全部正确' : '回答正确';
           el.feedback.className = 'feedback ok';
           setTimeout(nextQuestion, 800);
         } else {
           var correctList = [], missedList = [];
           words.forEach(function (w, j) {
-            state.wrongWords.push(w);
-            Store.addMistake(w.word, 'spell');
-            if (wordMatched[j]) correctList.push(w.word);
-            else missedList.push(w.word);
+            if (wordMatched[j]) {
+              correctList.push(w.word);
+              Store.removeMistake(w.word);
+            } else {
+              state.wrongWords.push(w);
+              Store.addMistake(w.word, 'spell');
+              missedList.push(w.word);
+            }
           });
           el.feedback.textContent = '未答全。正确：' +
             (correctList.length ? correctList.join('、') : '无') +
@@ -338,6 +356,7 @@
 
       if (posOk) {
         state.correct += 1;
+        Store.removeMistake(w.word);
         el.feedback.textContent = '词性正确';
         el.feedback.className = 'feedback ok';
         el.questionBox.insertAdjacentHTML('beforeend',
