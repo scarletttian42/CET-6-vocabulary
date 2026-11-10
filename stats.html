@@ -92,7 +92,7 @@
     document.getElementById('st-rounds').textContent = historyList.length;
     document.getElementById('st-answered').textContent = totalAnswered;
     document.getElementById('st-rate').textContent = totalAnswered ? Math.round(totalCorrect / totalAnswered * 100) + '%' : '—';
-    document.getElementById('st-mistakes').textContent = Store.getMistakes().length;
+    document.getElementById('st-mistakes').textContent = Store.getValidMistakes().length;
 
     // 分模式正确率（基于练习记录）
     var modeGrid = document.getElementById('mode-grid');
