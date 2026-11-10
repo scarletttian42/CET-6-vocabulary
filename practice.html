@@ -278,6 +278,7 @@
         words.forEach(function (w, j) {
           Store.recordAnswer(w.word, wordMatched[j]);
         });
+        renderTopbarPills();
     
         if (allCorrect) {
           state.correct += 1;
@@ -339,6 +340,7 @@
 
       state.answered += 1;
       Store.recordAnswer(w.word, posOk);
+      renderTopbarPills();
 
       el.questionBox.querySelectorAll('.pos-btn').forEach(function (b) {
         var p = b.getAttribute('data-pos');
@@ -384,6 +386,7 @@
         state.manualCount += 1;
         state.wrongWords.push(w);
         Store.addMistake(w.word, 'manual');
+        renderTopbarPills();
         nextQuestion();
       });
     }    
