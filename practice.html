@@ -210,7 +210,7 @@
       var w = state.queue[state.idx];
       el.modeTag.textContent = MODE_LABEL[state.mode];
       el.progressText.textContent = (state.idx + 1) + ' / ' + state.queue.length;
-      el.progressFill.style.width = (state.idx / state.queue.length * 100) + '%';
+      el.progressFill.style.width = ((state.idx + 1) / state.queue.length * 100) + '%';
 
       if (state.mode === 'spell') renderSpell(w);
       else renderPos(w);
@@ -383,6 +383,7 @@
       if (next) next.addEventListener('click', nextQuestion);
       if (okBtn) okBtn.addEventListener('click', nextQuestion);
       if (manualBtn) manualBtn.addEventListener('click', function () {
+        state.correct -= 1;
         state.manualCount += 1;
         state.wrongWords.push(w);
         Store.addMistake(w.word, 'manual');
