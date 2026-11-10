@@ -318,6 +318,8 @@
         '<div class="q-word-hint">请选出下面单词的词性（可多选），并回忆中文释义</div>' +
         '<div class="q-word">' + escapeHtml(w.word) + '</div>' +
         '<div class="pos-btns">' + btns + '</div>' +
+        '<input class="spell-input" id="meaning-input" type="text" autocomplete="off" ' +
+          'style="display:block; margin:12px auto 14px;" placeholder="写出你记得的中文释义（不判分）">' +
         '<div class="quiz-actions"><button class="btn btn-primary" id="btn-reveal">揭晓答案</button></div>';
 
       el.questionBox.querySelectorAll('.pos-btn').forEach(function (b) {
@@ -330,9 +332,16 @@
         });
       });
       document.getElementById('btn-reveal').addEventListener('click', function () { revealPos(w); });
+      var meaningInput = document.getElementById('meaning-input');
+      meaningInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.isComposing) revealPos(w);
+      });
+      meaningInput.focus();
     }
 
     function revealPos(w) {
+      var rb = document.getElementById('btn-reveal');
+      if (!rb || rb.disabled) return;
       var correctSet = w.pos.slice().sort();
       var pickedSet = state.posPicked.slice().sort();
       var posOk = correctSet.length === pickedSet.length &&
@@ -350,10 +359,15 @@
       });
       document.getElementById('btn-reveal').disabled = true;
 
+      var meaningInput = document.getElementById('meaning-input');
+      var myMeaning = meaningInput ? meaningInput.value.trim() : '';
+      if (meaningInput) meaningInput.disabled = true;
+
       var pickedText = state.posPicked.length ? state.posPicked.join(' / ') : '（未选择）';
       var revealHtml =
         '<div class="line"><b>你的选择：</b>' + escapeHtml(pickedText) + (posOk ? ' ✓' : '') + '</div>' +
-        '<div class="line"><b>中文释义：</b>' + escapeHtml(w.meaning) + '</div>';
+        '<div class="line"><b>你写的释义：</b>' + escapeHtml(myMeaning || '（未填写）') + '</div>' +
+        '<div class="line"><b>标准释义：</b>' + escapeHtml(w.meaning) + '</div>';
       var actionsHtml;
 
       if (posOk) {
