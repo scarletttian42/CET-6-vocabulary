@@ -58,7 +58,9 @@ var Store = {
 var POS_BASE = ['v.', 'n.', 'adv.', 'adj.', 'pron.'];
 
 // 去重后的全量词库（两个词库合并）
+var _allWordsCache = null;
 function getAllWords() {
+  if (_allWordsCache) return _allWordsCache;
   var map = {};
   var sources = [].concat(
     typeof WORDS !== 'undefined' ? WORDS : [],
@@ -73,7 +75,8 @@ function getAllWords() {
       meaning: String(w.meaning || '').trim()
     };
   });
-  return Object.keys(map).map(function (k) { return map[k]; });
+  _allWordsCache = Object.keys(map).map(function (k) { return map[k]; });
+  return _allWordsCache;
 }
 
 // 按模式获取对应词库
