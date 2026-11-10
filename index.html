@@ -93,7 +93,7 @@
       '当前词库共 ' + words.length + ' 个单词，支持拼写练习、词性自测与错题重练。';
     document.getElementById('st-total').textContent = words.length;
     document.getElementById('st-learned').textContent = learned;
-    document.getElementById('st-mistakes').textContent = Store.getMistakes().length;
+    document.getElementById('st-mistakes').textContent = Store.getValidMistakes().length;
     document.getElementById('st-rounds').textContent = Store.getHistory().length;
   </script>
 </body>
