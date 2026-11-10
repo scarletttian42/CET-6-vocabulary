@@ -23,6 +23,10 @@ var Store = {
 
   // —— 错题本 ——
   getMistakes: function () { return this.load(this.KEYS.mistakes, []); },
+  // 只返回词库里仍然存在的错题（过滤掉改拼写后残留的无效条目）
+  getValidMistakes: function () {
+    return this.getMistakes().filter(function (m) { return getWord(m.word); });
+  },
   addMistake: function (word, reason) {
     var list = this.getMistakes();
     if (!list.some(function (m) { return m.word === word; })) {
@@ -194,5 +198,5 @@ function renderTopbarPills() {
   var p = document.getElementById('pill-progress');
   var m = document.getElementById('pill-mistakes');
   if (p) p.textContent = learned + '/' + getAllWords().length;
-  if (m) m.textContent = String(Store.getMistakes().length);
+  if (m) m.textContent = String(Store.getValidMistakes().length);
 }
