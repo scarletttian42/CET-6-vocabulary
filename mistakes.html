@@ -49,7 +49,7 @@
     renderTopbarPills();
 
     function render() {
-      var mistakes = Store.getMistakes();
+      var mistakes = Store.getValidMistakes();
       var listEl = document.getElementById('mistake-list');
       document.getElementById('count-text').textContent = '（共 ' + mistakes.length + ' 词）';
 
