@@ -1438,9 +1438,16 @@ const WORDS = [
 ];
 // ===== 拼写模式词库（等你发新 Excel 后填入） =====
 const WORDS_SPELL = [
-  { "word": "persist", "pos": ["v."], "meaning": "坚持" },
-  { "word": "insist", "pos": ["v."], "meaning": "坚持" },
-  { "word": "persevere", "pos": ["v."], "meaning": "坚持" },
-  { "word": "abandon", "pos": ["v."], "meaning": "放弃" },
-  { "word": "ability", "pos": ["n."], "meaning": "能力" }
+  { "word": "persist", "senses": [ { "pos": "v.", "meaning": "坚持" } ] },
+  { "word": "insist", "senses": [ { "pos": "v.", "meaning": "坚持" } ] },
+  { "word": "persevere", "senses": [ { "pos": "v.", "meaning": "坚持" } ] },
+  { "word": "abandon", "senses": [ { "pos": "v.", "meaning": "放弃" } ] },
+  { "word": "ability", "senses": [ { "pos": "n.", "meaning": "能力" } ] },
+
+  { "word": "plot", "senses": [
+      { "pos": "n.", "meaning": "情节" },
+      { "pos": "n.", "meaning": "小块土地" },
+      { "pos": "v.", "meaning": "绘图" }
+  ] },
+  { "word": "draw", "senses": [ { "pos": "v.", "meaning": "绘图" } ] }
 ];
