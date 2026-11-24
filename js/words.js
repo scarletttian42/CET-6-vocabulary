@@ -1436,7 +1436,6 @@ const WORDS = [
   { "word": "depot", "pos": ["n."], "meaning": "仓库" },
   { "word": "sarcasm", "pos": ["n."], "meaning": "讽刺，挖苦，嘲笑" }
 ];
-];
 // ===== 拼写模式词库（等你发新 Excel 后填入） =====
 const WORDS_SPELL = [
   { "word": "persist", "pos": ["v."], "meaning": "坚持" },
