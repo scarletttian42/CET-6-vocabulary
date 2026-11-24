@@ -56,7 +56,34 @@ var Store = {
 
 // ===== 词库 =====
 var POS_BASE = ['v.', 'n.', 'adv.', 'adj.', 'pron.'];
-
+// 把一条原始词条归一化成统一形状：{word, pos, meaning, senses}
+// 拼写模式词库用 senses 结构；词性自测词库（WORDS）沿用旧的 pos/meaning 扁平结构
+function normalizeWordEntry(w) {
+  if (!w || !w.word) return null;
+  var posList, meaningStr, sensesOut = null;
+  if (Array.isArray(w.senses) && w.senses.length) {
+    var posSet = [];
+    var meanings = [];
+    w.senses.forEach(function (s) {
+      var pp = String((s && s.pos) || '').trim();
+      var mm = String((s && s.meaning) || '').trim();
+      if (pp && posSet.indexOf(pp) === -1) posSet.push(pp);
+      if (mm) meanings.push(mm);
+    });
+    posList = posSet;
+    meaningStr = meanings.join('；');
+    sensesOut = w.senses;
+  } else {
+    posList = w.pos || [];
+    meaningStr = String(w.meaning || '').trim();
+  }
+  return {
+    word: String(w.word).trim(),
+    pos: posList.map(function (p) { return String(p).trim(); }).filter(Boolean),
+    meaning: meaningStr,
+    senses: sensesOut
+  };
+}
 // 去重后的全量词库（两个词库合并）
 var _allWordsCache = null;
 function getAllWords() {
@@ -67,13 +94,9 @@ function getAllWords() {
     typeof WORDS_SPELL !== 'undefined' ? WORDS_SPELL : []
   );
   sources.forEach(function (w) {
-    if (!w || !w.word) return;
-    var key = String(w.word).trim().toLowerCase();
-    map[key] = {
-      word: String(w.word).trim(),
-      pos: (w.pos || []).map(function (p) { return String(p).trim(); }).filter(Boolean),
-      meaning: String(w.meaning || '').trim()
-    };
+    var entry = normalizeWordEntry(w);
+    if (!entry) return;
+    map[entry.word.toLowerCase()] = entry;
   });
   _allWordsCache = Object.keys(map).map(function (k) { return map[k]; });
   return _allWordsCache;
@@ -86,13 +109,9 @@ function getWordsForMode(mode) {
     : (typeof WORDS !== 'undefined' ? WORDS : []);
   var map = {};
   src.forEach(function (w) {
-    if (!w || !w.word) return;
-    var key = String(w.word).trim().toLowerCase();
-    map[key] = {
-      word: String(w.word).trim(),
-      pos: (w.pos || []).map(function (p) { return String(p).trim(); }).filter(Boolean),
-      meaning: String(w.meaning || '').trim()
-    };
+    var entry = normalizeWordEntry(w);
+    if (!entry) return;
+    map[entry.word.toLowerCase()] = entry;
   });
   return Object.keys(map).map(function (k) { return map[k]; });
 }
@@ -100,14 +119,21 @@ function getWordsForMode(mode) {
 function groupSpellWords(words) {
   var groups = {};
   words.forEach(function (w) {
-    var key = normalize(w.meaning);
-    if (!groups[key]) {
-      groups[key] = { meaning: w.meaning, pos: [], words: [] };
-    }
-    w.pos.forEach(function (p) {
-      if (groups[key].pos.indexOf(p) === -1) groups[key].pos.push(p);
+    if (!w || !w.word) return;
+    // 拼写模式词库改用 senses 结构；没有 senses 的旧格式整条当作一个义项
+    var senses = (Array.isArray(w.senses) && w.senses.length)
+      ? w.senses
+      : [{ pos: (w.pos && w.pos[0]) || '', meaning: w.meaning || '' }];
+    senses.forEach(function (s) {
+      if (!s || !s.meaning) return;
+      var p = String(s.pos || '').trim();
+      var m = String(s.meaning).trim();
+      var key = p + '|' + normalize(m);   // 按「词性 + 释义」分组
+      if (!groups[key]) groups[key] = { pos: p ? [p] : [], meaning: m, words: [] };
+      if (!groups[key].words.some(function (x) { return x.word === w.word; })) {
+        groups[key].words.push(w);
+      }
     });
-    groups[key].words.push(w);
   });
   return Object.keys(groups).map(function (k) { return groups[k]; });
 }
